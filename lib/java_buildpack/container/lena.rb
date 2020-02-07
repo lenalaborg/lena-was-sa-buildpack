@@ -45,7 +45,10 @@ module JavaBuildpack
         # move install shell / entry shell
         move_to(lenaInstallScriptPath,@droplet.sandbox)
         installShPath = "#{@droplet.sandbox}/"+ lenaInstallScriptPathArr[2]
+        chmod(installShPath,755)
         move_to(lenaEntryScriptPath,@droplet.sandbox)
+        entryShPath = "#{@droplet.sandbox}/"+ lenaEntryScriptPathArr[2]
+        chmod(entryShPath,755)
 
         # Download LENA WAS install file and extract
         download(@version, @uri) { |file| expand file }
@@ -132,16 +135,19 @@ module JavaBuildpack
       end
 
       def move_to(source, destination)
-        print "==== move file from  #{source} to #{destination}  ==== \n"
+        print "#{'----->'.green.bold} move file from  #{source} to #{destination}   \n"
         FileUtils.mkdir_p destination
         shell "mv #{source} #{destination}" 
       end
 
       def run_sh(shPath)
-        print "==== run shell #{shPath} ==== \n"
-        shell "chmod 755 #{shPath}"
+        print "#{'----->'.green.bold} run shell #{shPath}  \n"
         shell "sh #{shPath}"       
-        
+      end
+
+      def chmod(shPath, authVar)
+        print "#{'----->'.green.bold} chmod  #{authVar} #{shPath}  \n"
+        shell "chmod #{authVar} #{shPath}"   
       end
 
     end
