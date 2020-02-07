@@ -260,7 +260,7 @@ config_was_log() {
     fi
     
     #call logrotate config function
-    config_logrotate
+    #config_logrotate
     
 }
 
@@ -659,7 +659,7 @@ config_manager() {
 #Start by Server Type
 _start() {
 	#Run SSH daemon if selected 
-	@{image.ssh.runCommand}	
+	#@{image.ssh.runCommand}	
 	
 	#Config memory size
 	 config_memSize $*
