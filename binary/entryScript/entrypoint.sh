@@ -73,8 +73,8 @@ start_lena_server() {
     fi
 
     log "su ${LENA_USER} -c ${LENA_SERVER_HOME}/start.sh ${_START_OPTION}" 
-    #su ${LENA_USER} -c ${LENA_SERVER_HOME}/start.sh ${_START_OPTION}
-    ${LENA_SERVER_HOME}/start.sh ${_START_OPTION}
+    su ${LENA_USER} -c ${LENA_SERVER_HOME}/start.sh ${_START_OPTION}
+    #${LENA_SERVER_HOME}/start.sh ${_START_OPTION}
     log " " 
 }
 
@@ -703,8 +703,8 @@ _start() {
 	    		config_java_domain_cache_ttl 10
 	    	fi
 	    	# Reset JVM Route Value 
-    		# su ${LENA_USER} -c "${LENA_HOME}/etc/scale/reset-jvmRoute.sh" | tee -a ${LENA_ENTRY_LOG}
-            ${LENA_HOME}/etc/scale/reset-jvmRoute.sh | tee -a ${LENA_ENTRY_LOG}
+    		su ${LENA_USER} -c "${LENA_HOME}/etc/scale/reset-jvmRoute.sh" | tee -a ${LENA_ENTRY_LOG}
+            # ${LENA_HOME}/etc/scale/reset-jvmRoute.sh | tee -a ${LENA_ENTRY_LOG}
 			if [[ "${LENA_AGENT_RUN}" = "Y" ]]; then
 				start_lena_agent $*
 				sleep 3
