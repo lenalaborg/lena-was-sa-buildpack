@@ -34,30 +34,23 @@ module JavaBuildpack
         tmpDirPathArr = Dir.entries(lenaBinPath)
         lenaBinPath = lenaBinPath+tmpDirPathArr[2]+"/binary"
         
-        print "==== 1. lenaBinPath : #{lenaBinPath} \n"
-
-        # lenaInstallFilePath = lenaBinPath + "/installFile/"
-        # lenaInstallFilePathArr = Dir.entries(lenaInstallFilePath)
-        # lenaInstallFilePath = lenaInstallFilePath + lenaInstallFilePathArr[2]
         lenaInstallScriptPath = lenaBinPath + "/installScript/"
         lenaInstallScriptPathArr = Dir.entries(lenaInstallScriptPath)
         lenaInstallScriptPath = lenaInstallScriptPath + lenaInstallScriptPathArr[2]
 
-        # print "==== 2. lenaInstallFilePath : #{lenaInstallFilePath} \n"
-        print "==== 3. lenaInstallScriptPath : #{lenaInstallScriptPath} \n" 
-        print "===@droplet.sandbox : #{@droplet.sandbox} \n"
-        # unzip Tar
-        # expandByPath lenaInstallFilePath
-        # move install shell
+        lenaEntryScriptPath = lenaBinPath + "/entryScript/"
+        lenaEntryScriptPathArr = Dir.entries(lenaEntryScriptPath)
+        lenaEntryScriptPath = lenaEntryScriptPath + lenaEntryScriptPathArr[2]
+
+        # move install shell / entry shell
         move_to(lenaInstallScriptPath,@droplet.sandbox)
-        # run install shell
-        runShPath = "#{@droplet.sandbox}/"+ lenaInstallScriptPathArr[2]
-        print "==== 4. runShPath : #{runShPath} \n"         
+        installShPath = "#{@droplet.sandbox}/"+ lenaInstallScriptPathArr[2]
+        move_to(lenaEntryScriptPath,@droplet.sandbox)
 
+        # Download LENA WAS install file and extract
         download(@version, @uri) { |file| expand file }
-
         # Call Lena Install shell
-        run_sh runShPath
+        run_sh installShPath
         
         link_to(@application.root.children, root)
       end
@@ -72,7 +65,7 @@ module JavaBuildpack
           @droplet.environment_variables.as_env_vars,
           @droplet.java_home.as_env_var,
           'exec',
-          "$PWD/#{(@droplet.sandbox + 'servers/appServer/start.sh').relative_path_from(@droplet.root)}",
+          "$PWD/#{(@droplet.sandbox + 'entrypoint.sh').relative_path_from(@droplet.root)}",
           'run'
         ].flatten.compact.join(' ')
 
@@ -127,20 +120,9 @@ module JavaBuildpack
           #installFilePath=filePath+"lena-was-1.3.1.tar.gz"
           shell "tar xzf #{filePath} -C #{@droplet.sandbox} --strip 1 --exclude webapps 2>&1"
 
-          #installScriptPath=filePath+"install-lena-internal.sh"
-          #shell "mv #{installScriptPath} #{@droplet.sandbox}" 
-          #shell "chmod 755 #{@droplet.sandbox}/install-lena-internal.sh"
-          #shell "sh #{@droplet.sandbox}/install-lena-internal.sh"          
-          
-          # res1=`cat #{@droplet.sandbox}/install-lena-internal.sh` # returns stdout
-          # res2=%x[sh #{@droplet.sandbox}/install-lena-internal.sh] # returns stdout
-
           @droplet.copy_resources
 
           print "------------------------ Expanding By Path LENA --------------------------"
-
-          #configure_linking
-          #configure_jasper
         end
       end
 
