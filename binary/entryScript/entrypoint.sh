@@ -73,8 +73,8 @@ start_lena_server() {
     fi
 
     log "su ${LENA_USER} -c ${LENA_SERVER_HOME}/start.sh ${_START_OPTION}" 
-    su ${LENA_USER} -c ${LENA_SERVER_HOME}/start.sh ${_START_OPTION}
-    #${LENA_SERVER_HOME}/start.sh ${_START_OPTION}
+    #su ${LENA_USER} -c ${LENA_SERVER_HOME}/start.sh ${_START_OPTION}
+    ${LENA_SERVER_HOME}/start.sh ${_START_OPTION}
     log " " 
 }
 
@@ -395,6 +395,11 @@ download_template() {
 	if  [[ ! -z "${LENA_DOWNLOAD_CONNECT_TIMEOUT}" ]] ; then
 		_CONNECT_TIMEOUT=${LENA_DOWNLOAD_CONNECT_TIMEOUT}
 	fi
+
+    log "LENA_CONFIG_TEMPLATE_DOWNLOAD : ${LENA_CONFIG_TEMPLATE_DOWNLOAD}"
+    log "LENA_MANAGER_ADDRESS: ${LENA_MANAGER_ADDRESS}"
+    log "LENA_CONFIG_TEMPLATE_ID : ${LENA_CONFIG_TEMPLATE_ID}"
+    log "LENA_MANAGER_KEY : ${LENA_MANAGER_KEY}" 
 	
     if [[ "${LENA_CONFIG_TEMPLATE_DOWNLOAD}" = "Y" ]] && [[ ! -z "${LENA_MANAGER_ADDRESS}" ]] && [[ ! -z "${LENA_CONFIG_TEMPLATE_ID}" ]] && [[ ! -z "${LENA_MANAGER_KEY}" ]]; then
     	log "Download template from LENA Manager ${LENA_MANAGER_ADDRESS}, ContainerGroupName-Version : ${TEMPLATE_TAG}"
@@ -703,8 +708,8 @@ _start() {
 	    		config_java_domain_cache_ttl 10
 	    	fi
 	    	# Reset JVM Route Value 
-    		su ${LENA_USER} -c "${LENA_HOME}/etc/scale/reset-jvmRoute.sh" | tee -a ${LENA_ENTRY_LOG}
-            # ${LENA_HOME}/etc/scale/reset-jvmRoute.sh | tee -a ${LENA_ENTRY_LOG}
+    		# su ${LENA_USER} -c "${LENA_HOME}/etc/scale/reset-jvmRoute.sh" | tee -a ${LENA_ENTRY_LOG}
+            ${LENA_HOME}/etc/scale/reset-jvmRoute.sh | tee -a ${LENA_ENTRY_LOG}
 			if [[ "${LENA_AGENT_RUN}" = "Y" ]]; then
 				start_lena_agent $*
 				sleep 3
