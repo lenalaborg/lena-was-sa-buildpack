@@ -109,10 +109,6 @@ module JavaBuildpack
 
           @droplet.copy_resources
 
-          print "------------------------ Expanding LENA --------------------------"
-
-          #configure_linking
-          #configure_jasper
         end
       end
 
@@ -120,12 +116,11 @@ module JavaBuildpack
         with_timing "Expanding By Path #{@component_name} to #{@droplet.sandbox.relative_path_from(@droplet.root)}" do
           FileUtils.mkdir_p @droplet.sandbox
           
-          #installFilePath=filePath+"lena-was-1.3.1.tar.gz"
           shell "tar xzf #{filePath} -C #{@droplet.sandbox} --strip 1 --exclude webapps 2>&1"
 
           @droplet.copy_resources
 
-          print "------------------------ Expanding By Path LENA --------------------------"
+          print "\n#{'----->'.green.bold} Expanding By Path LENA  \n"
         end
       end
 
@@ -140,6 +135,11 @@ module JavaBuildpack
         shell "mv #{source} #{destination}" 
       end
 
+      def move_to2(source, destination)
+        print "#{'----->'.green.bold} move file from  #{source} to #{destination}  \n"
+        shell "mv #{source} #{destination}" 
+      end
+      
       def run_sh(shPath)
         print "#{'----->'.green.bold} run shell #{shPath}  \n"
         shell "sh #{shPath}"       
