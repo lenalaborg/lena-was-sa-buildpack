@@ -29,6 +29,7 @@ module JavaBuildpack
       # (see JavaBuildpack::Component::BaseComponent#compile)
       def compile
 
+        
         # GET LENA FILE PATH
         lenaBinPath = "/tmp/buildpackdownloads/"
         tmpDirPathArr = Dir.entries(lenaBinPath)
