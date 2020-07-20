@@ -18,6 +18,9 @@ LENA_SERVER_NAME=appServer
 LENA_SERVER_HOME=/tmp/app/.java-buildpack/lena/servers/appServer
 LENA_USER=vcap
 
+############################################
+###### Paste From docker entry point. ######
+############################################
 
 if [[ ${PAAS_TA_FLAG} = "N" ]]; then
 	mkdir -p ${LENA_HOME}
@@ -258,13 +261,7 @@ case ${LENA_SERVER_TYPE} in
 	        	echo "sed -i "s/checkedOsUsers=\"root\"/checkedOsUsers=\"\"/g" ${LENA_SERVER_HOME}/conf/server.xml"
 		        sed -i "s/checkedOsUsers=\"root\"/checkedOsUsers=\"\"/g" ${LENA_SERVER_HOME}/conf/server.xml
 	        	cat ${LENA_SERVER_HOME}/conf/server.xml | grep checkedOsUsers
-	        fi
-		else
-			# ##### PAAS-TA #####
-	    	echo "==== Set root path ==="
-		    sed -i "s/tmp\/app/home\/vcap\/app/g" ${LENA_SERVER_HOME}/env.sh
-		    sed -i "s/tmp\/app/home\/vcap\/app/g" ${LENA_HOME}/etc/info/java-home.info       
-		    sed -i "s/tmp\/app\/\.java\-buildpack\/lena\/depot\/lena-application\/ROOT/home\/vcap\/app/g" ${LENA_SERVER_HOME}/conf/Catalina/localhost/ROOT.xml          
+	        fi          
 	    fi
 	
         echo "Change LOG_OUTPUT to console"
@@ -282,22 +279,20 @@ case ${LENA_SERVER_TYPE} in
 		sed -i "s/${USER_LN}/${N_USER_LN}/g" ${LENA_SERVER_HOME}/env.sh
         
         #LOG ROTATE setup
-        echo "Create LENA logrotate configure path = /etc/logrotate.d/lena"
-        touch /etc/logrotate.d/lena
         if [[ ${PAAS_TA_FLAG} = "N" ]]; then
         	# ##### DOCKER #####
+        	echo "Create LENA logrotate configure path = /etc/logrotate.d/lena"
+        	touch /etc/logrotate.d/lena
         	echo "/usr/local/lena/servers/appServer/logs/*log {" >> /etc/logrotate.d/lena
-        else
-        	# ##### PAAS-TA #####
-        	echo "/home/vcap/app/.java-buildpack/lena/servers/appServer/logs/*log {" >> /etc/logrotate.d/lena
+        	echo "    copytruncate"                              >> /etc/logrotate.d/lena
+	        echo "    daily"                                     >> /etc/logrotate.d/lena
+	        echo "    rotate 30"                                 >> /etc/logrotate.d/lena
+	        echo "    missingok"                                 >> /etc/logrotate.d/lena
+	        echo "    dateext"                                   >> /etc/logrotate.d/lena
+	        echo "    notifempty"                                >> /etc/logrotate.d/lena
+	        echo "}"                                             >> /etc/logrotate.d/lena
         fi
-        echo "    copytruncate"                              >> /etc/logrotate.d/lena
-        echo "    daily"                                     >> /etc/logrotate.d/lena
-        echo "    rotate 30"                                 >> /etc/logrotate.d/lena
-        echo "    missingok"                                 >> /etc/logrotate.d/lena
-        echo "    dateext"                                   >> /etc/logrotate.d/lena
-        echo "    notifempty"                                >> /etc/logrotate.d/lena
-        echo "}"                                             >> /etc/logrotate.d/lena
+        
         
         echo "DELETE AJP Executor / Connector from server.xml"
 		AJP_LINES=`grep -n "ajpThreadPool" ${LENA_SERVER_HOME}/conf/server.xml | cut -d: -f1`
@@ -331,6 +326,14 @@ case ${LENA_SERVER_TYPE} in
     	sed -i "s/CATALINA_OUT\=\${LOG_HOME}\/\${INST_NAME}/CATALINA_OUT\=\${LOG_HOME}\/\${INST_NAME}\.log/g" ${LENA_SERVER_HOME}/env.sh
     	echo "Change file name of Stop.sh Log"
         sed -i "s/\${CATALINA_OUT}_\`date +%Y%m%d\`\.log/\${CATALINA_OUT}/g" ${LENA_SERVER_HOME}/stop.sh
+        
+        if [[ ${PAAS_TA_FLAG} = "Y" ]]; then 
+        	# ##### PAAS-TA #####
+	    	echo "==== Set root path ==="
+		    sed -i "s/tmp\/app/home\/vcap\/app/g" ${LENA_SERVER_HOME}/env.sh
+		    sed -i "s/tmp\/app/home\/vcap\/app/g" ${LENA_HOME}/etc/info/java-home.info       
+		    sed -i "s/tmp\/app\/\.java\-buildpack\/lena\/depot\/lena-application\/ROOT/home\/vcap\/app/g" ${LENA_SERVER_HOME}/conf/Catalina/localhost/ROOT.xml
+        fi
         
         #echo "Change LOG_HOME to @{lena.home.regexp}/logs/${SERVER_ID}"
         #sed -i "s/\${CATALINA_HOME}\/logs/@{lena.home.regexp}\/logs\/\${SERVER_ID}/g" ${LENA_SERVER_HOME}/env.sh
@@ -360,12 +363,6 @@ case ${LENA_SERVER_TYPE} in
 		        sed -i "s/checkedOsUsers=\"root\"/checkedOsUsers=\"\"/g" ${LENA_SERVER_HOME}/conf/server.xml
 	        	cat ${LENA_SERVER_HOME}/conf/server.xml | grep checkedOsUsers
 	        fi
-	    else
-	    	# ##### PAAS-TA #####
-	    	echo "==== Set root path ==="
-		        sed -i "s/tmp\/app/home\/vcap\/app/g" ${LENA_SERVER_HOME}/env.sh
-		        sed -i "s/tmp\/app/home\/vcap\/app/g" ${LENA_HOME}/etc/info/java-home.info       
-		        sed -i "s/tmp\/app\/\.java\-buildpack\/lena\/depot\/lena-application\/ROOT/home\/vcap\/app/g" ${LENA_SERVER_HOME}/conf/Catalina/localhost/ROOT.xml          
 	    fi  	
 
         echo "Change LOG_OUTPUT to console"
@@ -383,22 +380,19 @@ case ${LENA_SERVER_TYPE} in
 		sed -i "s/${USER_LN}/${N_USER_LN}/g" ${LENA_SERVER_HOME}/env.sh
 		        
         #LOG ROTATE setup
-        echo "Create LENA logrotate configure path = /etc/logrotate.d/lena"
-        touch /etc/logrotate.d/lena
         if [[ ${PAAS_TA_FLAG} = "N" ]]; then
         	# ##### DOCKER #####
+        	echo "Create LENA logrotate configure path = /etc/logrotate.d/lena"
+        	touch /etc/logrotate.d/lena
         	echo "/usr/local/lena/servers/appServer/logs/*log {" >> /etc/logrotate.d/lena
-        else
-        	# ##### PAAS-TA #####
-        	echo "/home/vcap/app/.java-buildpack/lena/servers/appServer/logs/*log {" >> /etc/logrotate.d/lena
+        	echo "    copytruncate"                              >> /etc/logrotate.d/lena
+	        echo "    daily"                                     >> /etc/logrotate.d/lena
+	        echo "    rotate 30"                                 >> /etc/logrotate.d/lena
+	        echo "    missingok"                                 >> /etc/logrotate.d/lena
+	        echo "    dateext"                                   >> /etc/logrotate.d/lena
+	        echo "    notifempty"                                >> /etc/logrotate.d/lena
+	        echo "}"                                             >> /etc/logrotate.d/lena
         fi
-        echo "    copytruncate"                              >> /etc/logrotate.d/lena
-        echo "    daily"                                     >> /etc/logrotate.d/lena
-        echo "    rotate 30"                                 >> /etc/logrotate.d/lena
-        echo "    missingok"                                 >> /etc/logrotate.d/lena
-        echo "    dateext"                                   >> /etc/logrotate.d/lena
-        echo "    notifempty"                                >> /etc/logrotate.d/lena
-        echo "}"                                             >> /etc/logrotate.d/lena
         
         echo "DELETE AJP Executor / Connector from server.xml"
 		AJP_LINES=`grep -n "ajpThreadPool" ${LENA_SERVER_HOME}/conf/server.xml | cut -d: -f1`
@@ -433,6 +427,13 @@ case ${LENA_SERVER_TYPE} in
     	echo "Change file name of Stop.sh Log"
         sed -i "s/\${CATALINA_OUT}_\`date +%Y%m%d\`\.log/\${CATALINA_OUT}/g" ${LENA_SERVER_HOME}/stop.sh
 
+		if [[ ${PAAS_TA_FLAG} = "Y" ]]; then 
+        	# ##### PAAS-TA #####
+	    	echo "==== Set root path ==="
+		    sed -i "s/tmp\/app/home\/vcap\/app/g" ${LENA_SERVER_HOME}/env.sh
+		    sed -i "s/tmp\/app/home\/vcap\/app/g" ${LENA_HOME}/etc/info/java-home.info       
+		    sed -i "s/tmp\/app\/\.java\-buildpack\/lena\/depot\/lena-application\/ROOT/home\/vcap\/app/g" ${LENA_SERVER_HOME}/conf/Catalina/localhost/ROOT.xml
+        fi
 
         #echo "Change LOG_HOME to ${LENA_HOME}/logs/${SERVER_ID}"
         #sed -i "s/\${CATALINA_HOME}\/logs/@{lena.home.regexp}\/logs\/\${SERVER_ID}/g" ${LENA_SERVER_HOME}/env.sh
