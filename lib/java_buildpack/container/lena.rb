@@ -143,7 +143,7 @@ module JavaBuildpack
       
       def run_sh(shPath)
         print "#{'----->'.green.bold} run shell #{shPath}  \n"
-        shell "sh #{shPath}"       
+        shell "bash -x #{shPath}  2> /tmp/app/rubylog.txt"       
       end
 
       def chmod(shPath, authVar)
